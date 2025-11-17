@@ -7,6 +7,8 @@ The input of `mice` is a GFF file in which each feature has an `ID` attribute (1
 
 ## Installation
 
+`mice` is written in rust, therefore you only need cargo to install it:
+
 ```bash
 cargo install --path .
 ```
