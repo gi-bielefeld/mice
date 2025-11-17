@@ -1,0 +1,5 @@
+/tests/**/gfa/
+/tests/**/size/
+/target
+/mice_output
+Cargo.lock
