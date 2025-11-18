@@ -43,4 +43,4 @@ In `<OUT_DIR>` MICE writes:
 
 * `output.gff`: block annotations (GFF)
 * `paths.txt`: genomes rewritten as synteny blocks
-* `partiotions.txt`: each synteny block which element it contains
+* `partitions.txt`: each synteny block which element it contains
