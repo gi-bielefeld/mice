@@ -13,6 +13,43 @@ The input of `mice` is a GFF file in which each feature has an `ID` attribute (1
 cargo install --path .
 ```
 
+## Quick start
+
+We provide five *E. coli* genomes as an example dataset.
+
+1. Use the provided graph  
+   A precomputed `example/graph.gff.gz` is included.  
+   Uncompress it and go directly to running `mice`.  
+
+2. (*Optional*) Build the pangenome graph yourself
+
+   Install `ggcat`:
+
+   ```bash
+   conda install -c conda-forge -c bioconda ggcat
+   ```
+
+   Build a compacted de Bruijn graph:
+
+   ```bash
+   ggcat build -k 31 -s 1 -l example/list.txt -o graph.gfa --gfa-v1
+   ```
+
+   Convert the graph to GFF:
+
+   ```bash
+   git clone git@github.com:lucaparmigiani/gfa2gff.git
+   cd gfa2gff
+   make
+   gfa2gff 31 graph.gfa $(ls -1 example/*.fna.gz) > graph.gff
+   ```
+
+3. Run mice
+
+   ```bash
+   mice graph.gff
+   ```
+
 ## Usage
 
 ```bash
