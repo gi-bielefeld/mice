@@ -4,3 +4,4 @@
 /target
 /mice_output
 Cargo.lock
+graph.stats.log
