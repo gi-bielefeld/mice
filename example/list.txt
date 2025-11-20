@@ -1,0 +1,5 @@
+GCF_000005845.2_ASM584v2_genomic.fna.gz
+GCF_000008865.2_ASM886v2_genomic.fna.gz
+GCF_000013265.1_ASM1326v1_genomic.fna.gz
+GCF_002853715.1_ASM285371v1_genomic.fna.gz
+GCF_003697165.2_ASM369716v2_genomic.fna.gz
