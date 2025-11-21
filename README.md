@@ -19,7 +19,7 @@ We provide five *E. coli* genomes as an example dataset.
 
 1. Use the provided graph  
    A precomputed `example/graph.gff.gz` is included.  
-   Uncompress it and go directly to running `mice`.  
+   Uncompress it (for example: `gunzip -c example/graph.gff.gz > graph.gff`) and go directly to running `mice`.  
 
 2. (*Optional*) Build the pangenome graph yourself
 
