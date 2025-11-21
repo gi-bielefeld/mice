@@ -38,7 +38,7 @@ We provide five *E. coli* genomes as an example dataset.
    Convert the graph to GFF:
 
    ```bash
-   git clone git@github.com:lucaparmigiani/gfa2gff.git
+   git clone https://github.com/lucaparmigiani/gfa2gff.git
    cd gfa2gff
    make
    gfa2gff 31 graph.gfa $(ls -1 example/*.fna.gz) > graph.gff
