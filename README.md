@@ -41,7 +41,8 @@ We provide five *E. coli* genomes as an example dataset.
    git clone https://github.com/lucaparmigiani/gfa2gff.git
    cd gfa2gff
    make
-   gfa2gff 31 graph.gfa $(ls -1 example/*.fna.gz) > graph.gff
+   cd ..
+   ./gfa2gff/gfa2gff 31 graph.gfa $(ls -1 example/*.fna.gz) > graph.gff
    ```
 
 3. Run mice
