@@ -1,8 +1,7 @@
 use crate::io::*;
 use anyhow::Result;
 use std::collections::hash_map;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::BufRead;
 use std::str;
 
 //The Gff assumed here are from SibeliaZ and Cactus with a ID as attributes and a 1-based index
@@ -259,8 +258,7 @@ impl Gff {
         let mut header: HashMap<String, usize> = HashMap::default();
         let mut num_nodes = 0usize;
 
-        let file = File::open(filename)?;
-        let mut reader = BufReader::new(file);
+        let mut reader = bufreader_from_compressed_file(filename);
 
         // Parsing gff
         let mut buf = vec![];

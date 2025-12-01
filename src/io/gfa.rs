@@ -1,8 +1,7 @@
 use crate::io::*;
 use anyhow::Result;
 use std::collections::hash_map;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::BufRead;
 use std::str;
 
 pub struct Gfa;
@@ -73,8 +72,7 @@ impl Gfa {
     }
 
     pub fn parse_gfa_paths(filename: &str, group_by: bool) -> Result<(GenomeBundle, usize)> {
-        let file = File::open(filename)?;
-        let mut reader = BufReader::new(file);
+        let mut reader = bufreader_from_compressed_file(filename);
 
         let mut genomes: HashMap<String, PathBundle> = HashMap::default();
         let mut num_paths = 0usize;

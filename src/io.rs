@@ -3,7 +3,8 @@ use crate::collections::{HashMap, HashSet};
 use std::path;
 use std::str;
 use std::fs::File;
-use std::io::{BufWriter, Write};
+use std::io::{Read, BufReader,BufWriter, Write};
+use flate2::read::MultiGzDecoder;
 
 mod gfa;
 mod gff;
@@ -171,6 +172,17 @@ pub fn write_partition(
     Ok(())
 }
 
+pub fn bufreader_from_compressed_file(file: &str) -> BufReader<Box<dyn Read>> {
+    eprintln!("loading graph from {}", &file);
+    let f = std::fs::File::open(file).unwrap_or_else(|err| panic!("Error opening file {} (err: {})", &file, err));
+    let reader: Box<dyn Read> = if file.ends_with(".gz") {
+        Box::new(MultiGzDecoder::new(f))
+    } else {
+        Box::new(f)
+    };
+    BufReader::new(reader)
+}
+
 //#[allow(dead_code)]
 //pub fn load_paths(input: &str, group_by: bool, force_ext: Option<&str>) -> Result<(GenomeBundle, usize)> {
 //    find_graph_type(input, force_ext)?.read_paths(input, group_by)
@@ -178,11 +190,17 @@ pub fn write_partition(
 
 // ---------- Private ----------
 fn find_graph_type(input: &str, force_ext: Option<&str>) -> Result<Box<dyn GraphReader>> {
-    let ext = force_ext.map(|s| s.to_ascii_lowercase()).or_else(|| {
-        path::Path::new(input)
-            .extension()
-            .and_then(|s| s.to_str())
-            .map(|s| s.to_ascii_lowercase())
+    let ext = force_ext
+    .map(|s| s.to_ascii_lowercase())
+    .or_else(|| {
+        let p = std::path::Path::new(input);
+        let last = p.extension()?.to_str()?.to_ascii_lowercase();
+        if last == "gz" {
+            let stem = p.file_stem()?.to_str()?.to_ascii_lowercase();
+            stem.rsplit('.').next().map(|s| s.to_string())
+        } else {
+            Some(last)
+        }
     });
 
     match ext.as_deref() {
