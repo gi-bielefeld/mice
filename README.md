@@ -13,6 +13,12 @@ The input of `mice` is a GFF file in which each feature has an `ID` attribute (1
 cargo install --path .
 ```
 
+Alternatively, `mice` is available on bioconda (use conda or mamba):
+
+```bash
+mamba install -c bioconda mice 
+```
+
 ## Quick start
 
 We provide five *E. coli* genomes as an example dataset.
