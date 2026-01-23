@@ -30,6 +30,18 @@ pub struct Cli {
     )]
     pub remove_duplicates: usize,
 
+    /// Minimum number of genomes an element must appear in to be kept. Use 0 to disable filtering.
+    #[arg(
+        short = 'q',
+        long = "quorum",
+        default_value_t = 0,
+        value_parser = ValueParser::new(|s: &str| -> Result<usize, String> {
+            let v: usize = s.parse().map_err(|_| "Expected a positive integer".to_string())?;
+            Ok(v)
+        })
+    )]
+    pub quorum: usize,
+
     /// Minimum element length (in bp) to keep elements that were not merged after the first compression.
     ///
     /// Compression is first performed. Elements that remain unmerged and are shorter than this

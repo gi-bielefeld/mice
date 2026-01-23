@@ -16,13 +16,15 @@ pub fn run_mice(
 
     let graph_input = &args.graph_input;
     let remove_duplicates = args.remove_duplicates;
+    let quorum = args.quorum;
     let group_by = args.group_by;
     let min_size = args.min_size;
     let dirty = args.dirty;
     let force_ext = None;
 
     // Lets go
-    let (graph_bundle, path_bundle, partition_bundle) = load_graph(graph_input, force_ext, remove_duplicates, group_by, dirty)?;
+    let (graph_bundle, path_bundle, partition_bundle) =
+        load_graph(graph_input, force_ext, remove_duplicates, quorum, group_by, dirty)?;
 
     let GraphBundle { mut graph, num_nodes, duplicates, } = graph_bundle;
     let GenomeBundle { genomes, num_paths, node_indexer, } = path_bundle;
@@ -207,9 +209,10 @@ fn is_adj_size_one(adj: &mut [usize], next: &mut usize, node_to_part: &[usize]) 
 #[allow(dead_code)]
 pub fn run_mice_test(input: &str, force_ext: Option<&str>) -> Result<usize> {
     let remove_duplicates = 0usize;
+    let quorum = 0usize;
     let group_by = false;
     let dirty = false;
-    let (graph_bundle, genome_bundle, partition_bundle) = load_graph(input, force_ext, remove_duplicates, group_by, dirty)?;
+    let (graph_bundle, genome_bundle, partition_bundle) = load_graph(input, force_ext, remove_duplicates, quorum, group_by, dirty)?;
     let GraphBundle { mut graph, num_nodes, duplicates, } = graph_bundle;
 
     let partition_bundle = compress_graph(&mut graph, num_nodes, partition_bundle, &duplicates);

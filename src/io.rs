@@ -74,10 +74,11 @@ pub fn load_graph(
     input: &str,
     force_ext: Option<&str>,
     remove_duplicates: usize,
+    quorum: usize,
     group_by: bool,
     dirty: bool,
 ) -> Result<(GraphBundle, GenomeBundle, PartitionBundle)> {
-    find_graph_type(input, force_ext)?.read_graph(input, remove_duplicates, group_by, dirty)
+    find_graph_type(input, force_ext)?.read_graph(input, remove_duplicates, quorum, group_by, dirty)
 }
 
 pub fn update_graph(
@@ -335,10 +336,41 @@ pub trait GraphReader {
         }
     }
 
+    fn apply_quorum_filter(
+        &self,
+        genomes: &HashMap<String, PathBundle>,
+        num_nodes: usize,
+        quorum: usize,
+        node_to_part: &mut [usize],
+    ) {
+        if quorum == 0 {
+            return;
+        }
+
+        let mut counts = vec![0usize; num_nodes];
+        for genome in genomes.values() {
+            let mut seen: HashSet<usize> = HashSet::default();
+            for path in genome.paths.iter() {
+                for &sid in path.iter() {
+                    if seen.insert(sid.id) {
+                        counts[sid.id] += 1;
+                    }
+                }
+            }
+        }
+
+        for (id, &count) in counts.iter().enumerate() {
+            if count < quorum {
+                node_to_part[id] = FILTERED;
+            }
+        }
+    }
+
     fn read_graph(
         &self,
         input: &str,
         remove_duplicates: usize,
+        quorum: usize,
         group_by: bool,
         dirty: bool,
     ) -> Result<(GraphBundle, GenomeBundle, PartitionBundle)> {
@@ -359,6 +391,8 @@ pub trait GraphReader {
                 node_to_part[el] = FILTERED;
             }
         }
+
+        self.apply_quorum_filter(&genome_bundle.genomes, num_nodes, quorum, &mut node_to_part);
 
         let graph = self.genomes_to_graph(&genome_bundle.genomes, num_nodes, &node_to_part);
 
