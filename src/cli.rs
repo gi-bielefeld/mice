@@ -62,6 +62,6 @@ pub struct Cli {
     pub group_by: bool,
 
     /// Avoid marking duplicated elements in each genome and merge them like they were unique
-    #[arg(long = "dirty", hide = true, action = ArgAction::SetTrue)]
-    pub dirty: bool,
+    #[arg(long = "merge-with-dup", action = ArgAction::SetTrue)]
+    pub merge_with_dup: bool,
 }
