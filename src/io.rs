@@ -62,6 +62,7 @@ pub struct GraphBundle {
     pub graph: Vec<Vec<usize>>,
     pub num_nodes: usize,
     pub duplicates: HashSet<usize>,
+    pub counts: Vec<usize>,
 }
 
 pub struct PartitionBundle {
@@ -336,16 +337,14 @@ pub trait GraphReader {
         }
     }
 
+    // TODO consider renaming or splitting purposes; we need `counts` even if no quorum.
     fn apply_quorum_filter(
         &self,
         genomes: &HashMap<String, PathBundle>,
         num_nodes: usize,
         quorum: usize,
         node_to_part: &mut [usize],
-    ) {
-        if quorum == 0 {
-            return;
-        }
+    ) -> Vec<usize> {
 
         let mut counts = vec![0usize; num_nodes];
         for genome in genomes.values() {
@@ -359,11 +358,15 @@ pub trait GraphReader {
             }
         }
 
-        for (id, &count) in counts.iter().enumerate() {
+        if quorum != 0 {
+            for (id, &count) in counts.iter().enumerate() {
             if count < quorum {
                 node_to_part[id] = FILTERED;
             }
+            }
         }
+        
+        return counts;
     }
 
     fn read_graph(
@@ -392,7 +395,8 @@ pub trait GraphReader {
             }
         }
 
-        self.apply_quorum_filter(&genome_bundle.genomes, num_nodes, quorum, &mut node_to_part);
+        // NB important that this runs even if quorum is 0 as it gets us our `counts`, which are needed for the linear algo
+        let counts = self.apply_quorum_filter(&genome_bundle.genomes, num_nodes, quorum, &mut node_to_part);
 
         let graph = self.genomes_to_graph(&genome_bundle.genomes, num_nodes, &node_to_part);
 
@@ -401,6 +405,7 @@ pub trait GraphReader {
                 graph,
                 num_nodes,
                 duplicates,
+                counts,
             },
             genome_bundle,
             PartitionBundle {

@@ -1,5 +1,5 @@
 use crate::io::*;
-use std::fs;
+use std::{fs};
 use anyhow::Result;
 use crate::collections::{HashSet, HashMap};
 use std::path;
@@ -26,7 +26,7 @@ pub fn run_mice(
     let (graph_bundle, path_bundle, partition_bundle) =
         load_graph(graph_input, force_ext, remove_duplicates, quorum, group_by, merge_with_dup)?;
 
-    let GraphBundle { mut graph, num_nodes, duplicates, } = graph_bundle;
+    let GraphBundle { mut graph, num_nodes, duplicates, counts} = graph_bundle;
     let GenomeBundle { genomes, num_paths, node_indexer, } = path_bundle;
 
     let mut partition_bundle = compress_graph(&mut graph, num_nodes, partition_bundle, &duplicates);
@@ -76,6 +76,7 @@ fn filter_min_size(
     }
 }
 
+// weg!!!
 fn connected_components(mut node_to_part: Vec<usize>, num_nodes: usize) -> PartitionBundle {
     let mut num_parts = 0usize;
 
@@ -106,6 +107,92 @@ fn connected_components(mut node_to_part: Vec<usize>, num_nodes: usize) -> Parti
     }
 }
 
+fn extend_side(
+    extremity: usize,
+    graph: &mut [Vec<usize>],
+    node_to_part: &mut [usize],
+    influence: &mut [usize],
+    deg: &mut [usize],
+) {
+    let element = extremity >> 1;
+    let mut queue: Vec<usize> = [extremity].to_vec();
+    let telomere = graph.len()-1;
+
+    while let Some(ux) = queue.pop() {
+        let u = ux >> 1;
+        for vy in &graph[ux] {
+            let v = vy >> 1;
+            if vy == &telomere || v == u || node_to_part[v] != v {
+                continue;
+            }
+            if influence[*vy] == UNINITIALIZED || influence[*vy] == extremity {
+                influence[*vy] = extremity;
+                deg[*vy] -= 1;
+                if deg[*vy] == 0 {
+                    node_to_part[v] = element;
+                    let vx = vy ^ 1usize;
+                    queue.push(vx);
+                }
+            }
+        }
+    }
+}
+
+pub fn compress_graph_linear(
+    graph: &mut [Vec<usize>],
+    num_nodes: usize,
+    partition_bundle: PartitionBundle,
+    duplicates: &HashSet<usize>,
+    counts: Vec<usize>,
+) -> PartitionBundle {
+    let mut node_to_part = partition_bundle.node_to_part;
+
+    let mut counts_dict: HashMap<usize,usize> = HashMap::default();
+
+    // TODO i can prob do this cleaner, in fewer steps, with some clever use of iter, map, collect
+    for i in 0..counts.len() {
+        counts_dict.insert(i, counts[i]);
+    }
+    let mut sorted_vec: Vec<(&usize, &usize)> = counts_dict.iter().collect();
+    sorted_vec.sort_by(|a,b| b.1.cmp(a.1));
+
+    let mut influence: Vec<usize> = Vec::new();
+    let mut deg: Vec<usize> = Vec::new();
+
+    for node in 0..graph.len() {
+        influence[node] = UNINITIALIZED;
+        deg[node] = graph[node].len();
+    }
+
+    for (element, _) in sorted_vec {
+        if node_to_part[*element] != *element {
+            continue;
+        }
+        let elem_tail = 2*element;
+        let elem_head = 2*element+1;
+        // TODO
+        extend_side(elem_tail, graph, &mut node_to_part, &mut influence, & mut deg);
+        extend_side(elem_head, graph, &mut node_to_part, &mut influence, & mut deg);
+    }
+
+    let mut num_parts = 0usize;
+    let mut i = 0usize;
+    // TODO does this need to be a while loop?
+    while i < num_nodes {
+        if node_to_part[i] != FILTERED {
+            if node_to_part[i] == i {
+                num_parts += 1;
+            }
+        }
+        i += 1;
+    }
+
+    PartitionBundle {
+        node_to_part,
+        num_parts,
+    }
+}
+
 // unifying (u_ext, v_ext)
 // before:
 // v_ext--u_ext==u2_ext--w_1_ext
@@ -113,6 +200,7 @@ fn connected_components(mut node_to_part: Vec<usize>, num_nodes: usize) -> Parti
 // after:
 // v_ext--w_1_ext
 //      \-w_2_ext
+// weg!!
 pub fn compress_graph(
     graph: &mut [Vec<usize>],
     num_nodes: usize,
@@ -182,6 +270,7 @@ pub fn compress_graph(
     connected_components(node_to_part, num_nodes)
 }
 
+// weg!
 fn is_adj_size_one(adj: &mut [usize], next: &mut usize, node_to_part: &[usize]) -> bool {
     let mut i = *next;
     //Find first not merged
@@ -213,9 +302,10 @@ pub fn run_mice_test(input: &str, force_ext: Option<&str>) -> Result<usize> {
     let group_by = false;
     let merge_with_dup = false;
     let (graph_bundle, genome_bundle, partition_bundle) = load_graph(input, force_ext, remove_duplicates, quorum, group_by, merge_with_dup)?;
-    let GraphBundle { mut graph, num_nodes, duplicates, } = graph_bundle;
+    let GraphBundle { mut graph, num_nodes, duplicates, counts, } = graph_bundle;
 
-    let partition_bundle = compress_graph(&mut graph, num_nodes, partition_bundle, &duplicates);
+    // let partition_bundle = compress_graph(&mut graph, num_nodes, partition_bundle, &duplicates);
+    let partition_bundle = compress_graph_linear(&mut graph, num_nodes, partition_bundle, &duplicates, counts);
 
     eprintln!("num genomes:\t{}", genome_bundle.genomes.len());
     eprintln!("num paths:\t{}", genome_bundle.num_paths);
