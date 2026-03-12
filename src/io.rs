@@ -9,7 +9,7 @@ use flate2::read::MultiGzDecoder;
 mod gfa;
 mod gff;
 
-//numbers convention for node_to_part array
+//numbers convention for node_to_part array & friends
 pub const UNINITIALIZED: usize = usize::MAX;
 pub const FILTERED: usize = usize::MAX - 1;
 

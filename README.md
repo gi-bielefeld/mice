@@ -71,7 +71,7 @@ mice [OPTIONS] <GRAPH_INPUT>
   Output directory (default: `mice_output`)
 
 * `-r, --remove-dup <X>`
-  Remove an element if it occurs more than *X* times in any genome (`0` = disable, default: `0`)
+  Remove an element if it occurs at least *X* times in any genome (`0` = disable, default: `0`)
 
 * `-m, --min-size <bp>`
   After first compression, drop unmerged elements shorter than `<bp>` base pairs, then recompress (default: `0`)

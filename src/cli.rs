@@ -14,7 +14,7 @@ pub struct Cli {
     #[arg(short = 'o', long = "out-dir", default_value = "mice_output")]
     pub out_dir: String,
 
-    /// Remove an element if it occurs more than x times in any genome. Use 0 to disable removal.
+    /// Remove an element if it occurs at least x times in any genome. Use 0 to disable removal.
     #[arg(
         short = 'r',
         long = "remove-dup",

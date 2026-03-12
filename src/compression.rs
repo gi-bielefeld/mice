@@ -22,7 +22,7 @@ pub fn run_mice(
     let merge_with_dup = args.merge_with_dup;
     let force_ext = None;
 
-    // Lets go
+    // Let's go
     let (graph_bundle, path_bundle, partition_bundle) =
         load_graph(graph_input, force_ext, remove_duplicates, quorum, group_by, merge_with_dup)?;
 
