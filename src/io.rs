@@ -60,7 +60,7 @@ pub struct PathBundle {
 
 pub struct GraphBundle {
     pub graph: Vec<Vec<usize>>,
-    pub num_nodes: usize,
+    pub  num_elements: usize,
     pub duplicates: HashSet<usize>,
     pub counts: Vec<usize>,
 }
@@ -84,10 +84,10 @@ pub fn load_graph(
 
 pub fn update_graph(
     genomes: &HashMap<String, PathBundle>,
-    num_nodes: usize,
+     num_elements: usize,
     node_to_part: &[usize],
 ) -> Vec<Vec<usize>> {
-    gff::Gff.genomes_to_graph(genomes, num_nodes, node_to_part)
+    gff::Gff.genomes_to_graph(genomes,  num_elements, node_to_part)
 }
 
 pub fn write_output(
@@ -135,7 +135,7 @@ pub fn write_paths(
 
 pub fn write_partition(
     out_dir: &path::Path,
-    num_nodes: usize,
+     num_elements: usize,
     node_to_part: &[usize],
     node_indexer: Option<NodeIndexer>,
 ) -> Result<()> {
@@ -144,19 +144,19 @@ pub fn write_partition(
     let file = File::create(output)?;
     let mut writer = BufWriter::new(file);
 
-    let mut id_to_node_str = vec![Vec::new(); num_nodes];
+    let mut id_to_node_str = vec![Vec::new();  num_elements];
     if let Some(node_indexer) = node_indexer {
         for (node_str, id) in node_indexer.map {
             id_to_node_str[id] = node_str;
         }
     } else {
         // default 1-based index
-        id_to_node_str = (1..=num_nodes).map(|x| x.to_string().into_bytes()).collect();
+        id_to_node_str = (1..= num_elements).map(|x| x.to_string().into_bytes()).collect();
     }
 
-    let mut partition: Vec<Vec<usize>> = (0..num_nodes).map(|_| Vec::new()).collect();
+    let mut partition: Vec<Vec<usize>> = (0.. num_elements).map(|_| Vec::new()).collect();
     for (id, &part) in node_to_part.iter().enumerate() {
-        if part != FILTERED && part < num_nodes {
+        if part != FILTERED && part <  num_elements {
             partition[part].push(id);
         }
     }
@@ -241,12 +241,12 @@ pub trait GraphReader {
     fn genomes_to_graph(
         &self,
         genomes: &HashMap<String, PathBundle>,
-        num_nodes: usize,
+         num_elements: usize,
         node_to_part: &[usize],
     ) -> Vec<Vec<usize>> {
         let mut edge_set: Vec<HashSet<usize>> =
-            (0..num_nodes * 2 + 1).map(|_| HashSet::default()).collect();
-        let mut graph: Vec<Vec<usize>> = (0..num_nodes * 2 + 1).map(|_| Vec::new()).collect();
+            (0.. num_elements * 2 + 1).map(|_| HashSet::default()).collect();
+        let mut graph: Vec<Vec<usize>> = (0.. num_elements * 2 + 1).map(|_| Vec::new()).collect();
         let telomer = graph.len() - 1;
 
         for (_, genome) in genomes.iter() {
@@ -341,12 +341,12 @@ pub trait GraphReader {
     fn apply_quorum_filter(
         &self,
         genomes: &HashMap<String, PathBundle>,
-        num_nodes: usize,
+         num_elements: usize,
         quorum: usize,
         node_to_part: &mut [usize],
     ) -> Vec<usize> {
 
-        let mut counts = vec![0usize; num_nodes];
+        let mut counts = vec![0usize;  num_elements];
         for genome in genomes.values() {
             let mut seen: HashSet<usize> = HashSet::default();
             for path in genome.paths.iter() {
@@ -377,7 +377,7 @@ pub trait GraphReader {
         group_by: bool,
         dirty: bool,
     ) -> Result<(GraphBundle, GenomeBundle, PartitionBundle)> {
-        let (genome_bundle, num_nodes) = self.read_paths(input, group_by)?;
+        let (genome_bundle,  num_elements) = self.read_paths(input, group_by)?;
 
         let (mut duplicates, duplicates_to_filter) =
             self.get_genome_duplicates(&genome_bundle.genomes, remove_duplicates);
@@ -386,7 +386,7 @@ pub trait GraphReader {
             duplicates = HashSet::default();
         }
 
-        let mut node_to_part: Vec<usize> = (0..num_nodes + 1).collect();
+        let mut node_to_part: Vec<usize> = (0.. num_elements + 1).collect();
         let num_parts = 0usize;
 
         if remove_duplicates > 0 {
@@ -396,14 +396,14 @@ pub trait GraphReader {
         }
 
         // NB important that this runs even if quorum is 0 as it gets us our `counts`, which are needed for the linear algo
-        let counts = self.apply_quorum_filter(&genome_bundle.genomes, num_nodes, quorum, &mut node_to_part);
+        let counts = self.apply_quorum_filter(&genome_bundle.genomes,  num_elements, quorum, &mut node_to_part);
 
-        let graph = self.genomes_to_graph(&genome_bundle.genomes, num_nodes, &node_to_part);
+        let graph = self.genomes_to_graph(&genome_bundle.genomes,  num_elements, &node_to_part);
 
         Ok((
             GraphBundle {
                 graph,
-                num_nodes,
+                 num_elements,
                 duplicates,
                 counts,
             },
