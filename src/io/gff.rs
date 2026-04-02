@@ -13,10 +13,10 @@ pub struct Gff;
 
 impl GraphReader for Gff {
     fn read_paths(&self, gfa_input: &str, group_by: bool) -> Result<(GenomeBundle, usize)> {
-        let (genome_bundle, num_nodes) = Self::parse_gff_paths(gfa_input, group_by)
+        let (genome_bundle, num_elements) = Self::parse_gff_paths(gfa_input, group_by)
             .map_err(|e| anyhow::anyhow!("Error reading GFF: {}", e))?;
 
-        Ok((genome_bundle, num_nodes))
+        Ok((genome_bundle, num_elements))
     }
 
     fn write_graph(
@@ -256,7 +256,7 @@ impl Gff {
     pub fn parse_gff_paths(filename: &str, group_by: bool) -> Result<(GenomeBundle, usize)> {
         let mut bounded_paths: HashMap<String, BoundedPath> = HashMap::default();
         let mut header: HashMap<String, usize> = HashMap::default();
-        let mut num_nodes = 0usize;
+        let mut num_elements = 0usize;
 
         let mut reader = bufreader_from_compressed_file(filename);
 
@@ -265,7 +265,7 @@ impl Gff {
         while reader.read_until(b'\n', &mut buf).unwrap_or(0) > 0 {
             if buf[0] != b'#' {
                 if let Some((path_name, genome_name, row)) = Self::extract_gff_info_from_row(&buf) {
-                    num_nodes = usize::max(row.id, num_nodes);
+                    num_elements = usize::max(row.id, num_elements);
 
                     let genome_name = if group_by { Some(genome_name) } else { None };
 
@@ -307,7 +307,7 @@ impl Gff {
             }
             buf.clear();
         }
-        num_nodes += 1;
+        num_elements += 1;
 
         let num_paths = bounded_paths.len();
 
@@ -361,6 +361,6 @@ impl Gff {
             num_paths,
             node_indexer,
         };
-        Ok((genome_bundle, num_nodes))
+        Ok((genome_bundle, num_elements))
     }
 }

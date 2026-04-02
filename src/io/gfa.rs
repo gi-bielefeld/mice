@@ -8,10 +8,10 @@ pub struct Gfa;
 
 impl GraphReader for Gfa {
     fn read_paths(&self, gfa_input: &str, group_by: bool) -> Result<(GenomeBundle, usize)> {
-        let (genome_bundle, num_nodes) = Self::parse_gfa_paths(gfa_input, group_by)
+        let (genome_bundle, num_elements) = Self::parse_gfa_paths(gfa_input, group_by)
             .map_err(|e| anyhow::anyhow!("Error reading GFA: {}", e))?;
 
-        Ok((genome_bundle, num_nodes))
+        Ok((genome_bundle, num_elements))
     }
 
     #[allow(unused_variables)]
@@ -109,13 +109,13 @@ impl Gfa {
             buf.clear();
         }
 
-        let num_nodes = node_indexer.next;
+        let num_elements = node_indexer.next;
         let node_indexer = Some(node_indexer);
         let genome_bundle = GenomeBundle {
             genomes,
             num_paths,
             node_indexer,
         };
-        Ok((genome_bundle, num_nodes))
+        Ok((genome_bundle, num_elements))
     }
 }
