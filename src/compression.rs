@@ -147,7 +147,6 @@ pub fn compress_graph_linear(
 
     let mut num_parts = 0usize;
     let mut i = 0usize;
-    // TODO does this need to be a while loop?
     while i < num_nodes {
         if node_to_part[i] != FILTERED {
             if node_to_part[i] == i {
