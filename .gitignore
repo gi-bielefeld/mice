@@ -6,3 +6,11 @@
 graph.stats.log
 graph.gfa
 /.vscode
+/example/*.gff
+/example/*.gfa
+
+clowm-nextflow.config
+results/*
+work/*
+.nextflow*
+.nextflow/*
