@@ -1,9 +1,9 @@
 #!/usr/bin/env nextflow
 process mice {
-    container "mice"
+    container "ghcr.io/gi-bielefeld/mice:f41a740_2026-06-10"
 
     input:
-    path input_graph
+    path input_graph_gff
     val params
 
     output:
@@ -19,7 +19,7 @@ process mice {
     // def dirty = params.no_group_by ? "" : ""
 
     """
-    mice ${remove_dup} ${quorum} ${min_size} ${no_group_by} ${merge_with_dup} -o ${params.out_dir} ${input_graph}
+    mice ${remove_dup} ${quorum} ${min_size} ${no_group_by} ${merge_with_dup} -o ${params.out_dir} ${input_graph_gff}
     """
 }
 
@@ -27,13 +27,13 @@ workflow {
     main:
     def input_channel = channel.empty()
 
-    def input_filepath = file(params.input_graph)
+    def input_filepath = file(params.input_graph_gff)
 
     if (input_filepath.exists() && !input_filepath.isDirectory()) {
-        input_channel = channel.fromPath(params.input_graph, checkIfExists: true)
+        input_channel = channel.fromPath(params.input_graph_gff, checkIfExists: true)
     }
     else {
-        error("[ERROR] Invalid input: '${params.input_graph}' is not a valid file path for --input_graph.")
+        error("[ERROR] Invalid input: '${params.input_graph_gff}' is not a valid file path for --input_graph_gff.")
     }
 
     mice(input_channel,params)

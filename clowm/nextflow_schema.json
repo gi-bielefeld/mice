@@ -1,0 +1,82 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://raw.githubusercontent.com/YOUR_PIPELINE/master/nextflow_schema.json",
+    "title": "Nextflow pipeline parameters",
+    "description": "A Nextflow workflow to execute the MICE synteny block tool, with the option to execute ggcat and gfa2gff to prepare MICE input. The JSON Schema was initially built using the nf-core pipeline schema builder, then edited manually.",
+    "type": "object",
+    "$defs": {
+        "input_output_options": {
+            "title": "Input / Output Options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "input_graph_gff": {
+                    "type": "string",
+                    "format": "file-path",
+                    "fa_icon": "fas fa-project-diagram",
+                    "description": "Path to MICE input graph file in .gff format"
+                },
+                "out_dir": {
+                    "type": "string",
+                    "description": "Name of output directory to which MICE writes its output files",
+                    "format": "directory-path",
+                    "fa_icon": "fas fa-folder-open"
+                }
+            },
+            "required": [
+                "input_graph_gff",
+                "out_dir"
+            ],
+            "fa_icon": "fas fa-copy"
+        },
+        "execution_options": {
+            "title": "Execution Options",
+            "type": "object",
+            "description": "Options to change the execution of the tool. For more information on the function of each parameter, see the Usage tab.",
+            "default": "",
+            "properties": {
+                "remove_dup": {
+                    "type": "integer",
+                    "default": 0,
+                    "minimum": 0,
+                    "description": "Remove an element if it occurs at least X times in any genome. 0 = disable.",
+                    "fa_icon": "fab fa-buffer"
+                },
+                "quorum": {
+                    "type": "integer",
+                    "default": 0,
+                    "minimum": 0,
+                    "description": "Minimum number of genomes an element must appear in to be kept. 0 = disable.",
+                    "fa_icon": "fas fa-filter"
+                },
+                "min_size": {
+                    "type": "integer",
+                    "default": 0,
+                    "minimum": 0,
+                    "description": "After first compression, drop unmerged elements shorter than X base pairs, then compress again. 0 = disable.",
+                    "fa_icon": "fas fa-ruler-horizontal"
+                },
+                "no_group_by": {
+                    "type": "boolean",
+                    "description": "If true, every path is treated as its own genome.",
+                    "fa_icon": "fas fa-align-left"
+                },
+                "merge_with_dup": {
+                    "type": "boolean",
+                    "description": "Avoid marking duplicated elements in each genome and merge them as if they were unique.",
+                    "fa_icon": "fab fa-buffer"
+                }
+            },
+            "fa_icon": "fas fa-cogs"
+        }
+    },
+    "allOf": [
+        {
+            "$ref": "#/$defs/input_output_options"
+        },
+        {
+            "$ref": "#/$defs/execution_options"
+        }
+    ]
+}
