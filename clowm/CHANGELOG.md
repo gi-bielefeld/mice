@@ -2,6 +2,12 @@
 
 ## Unreleased (Work in Progress)
 
+## 0.1.2 - 2026-07-24
+
+### Fixed
+
+- Handling of output directory; no longer wipes working dir if supplying "./" to --out_dir
+
 ## 0.1.1 - 2026-06-10
 
 ### Added

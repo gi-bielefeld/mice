@@ -7,7 +7,9 @@ process mice {
     val params
 
     output:
-    path params.out_dir, emit: out_dir
+    path "./output.gff", emit: out_graph
+    path "./partitions.txt", emit: out_parts
+    path "./paths.txt", emit: out_paths
 
     script:
     def remove_dup = "-r ${params.remove_dup}"
@@ -19,7 +21,7 @@ process mice {
     // def dirty = params.no_group_by ? "" : ""
 
     """
-    mice ${remove_dup} ${quorum} ${min_size} ${no_group_by} ${merge_with_dup} -o ${params.out_dir} ${input_graph_gff}
+    mice ${remove_dup} ${quorum} ${min_size} ${no_group_by} ${merge_with_dup} -o ./ ${input_graph_gff}
     """
 }
 
@@ -39,11 +41,19 @@ workflow {
     mice(input_channel,params)
 
     publish:
-    mice_output = mice.out.out_dir
+    mice_out_graph = mice.out.out_graph
+    mice_out_parts = mice.out.out_parts
+    mice_out_paths = mice.out.out_paths
 }
 
 output {
-    mice_output {
+    mice_out_graph {
+        mode "copy"
+    }
+    mice_out_parts {
+        mode "copy"
+    }
+    mice_out_paths {
         mode "copy"
     }
 }
