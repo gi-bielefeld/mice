@@ -2,6 +2,11 @@
 
 ## Unreleased (Work in Progress)
 
+## 0.1.4 - 2026-07-30
+
+### Added
+- First draft of `clowm/README.md`, `clowm/usage.md` and `clowm/output.md` 
+
 ## 0.1.3 - 2026-07-30
 
 ### Added

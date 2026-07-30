@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/YOUR_PIPELINE/master/nextflow_schema.json",
     "title": "Nextflow pipeline parameters",
-    "description": "A Nextflow workflow to execute the MICE synteny block tool, with the option to execute ggcat and gfa2gff to prepare MICE input. The JSON Schema was initially built using the nf-core pipeline schema builder, then edited manually.",
+    "description": "A Nextflow workflow to execute the MICE synteny block computation tool, with the option to execute ggcat and gfa2gff to prepare MICE input. The JSON Schema was initially built using the nf-core pipeline schema builder, then edited manually.",
     "type": "object",
     "$defs": {
         "input_output_options": {
