@@ -4,7 +4,8 @@
 /target
 /mice_output
 graph.stats.log
-graph.gfa
+*.gfa
+*.gff
 /.vscode
 /example/*.gff
 /example/*.gfa
@@ -14,3 +15,6 @@ results/*
 work/*
 .nextflow*
 .nextflow/*
+
+*.html
+trace*
