@@ -5,7 +5,7 @@
 | Name | Datatype | Default | Description |
 | :-: | :-: | :-: | :- | 
 | `input_graph_gff` | Filepath | - | A filepath to a single GFF-format file, where each entry has a 1-based `ID=` attribute. <br></br> The file must be plain-text (not "rich text", eg. `.rtf` or `.docx`), but can have any name and any suffix (ie. it doesn't necessarily need to end in `.gff` or similar). <br></br> Do not submit raw text or any other non-filepath input into this parameter - only a string representing a filepath, pointing to a file that already exists in your chosen S3 bucket. <br></br> This option is mutually exclusive with `input_fasta_dir`.|
-| `input_fasta_dir` | Filepath | - | A filepath to a directory in an accessible S3 bucket, containing several FASTA files from which the input to MICE will be constructed. <br></br> This option is mutually exclusive with `input_graph_gff`.|
+| `input_fasta_dir` | Filepath | - | A filepath to a directory in an accessible S3 bucket, containing several FASTA files from which the input to MICE will be constructed. <br></br> This option is mutually exclusive with `input_graph_gff`. <br></br> Permitted file endings: .fa, .fa.gz, .fna, .fna.gz, .fasta, .fasta.gz.|
 | `out_dir` | Filepath | - | A filepath to a directory where you want MICE to save its three output files. This can be just the root of an S3 bucket, or a directory inside it (if it doesn't exist, it will be created). See the "Output" tab for more information on the output format.|
 
 ## Execution Options
@@ -17,3 +17,4 @@
 | `min_size` | Integer | 0 | After the first compaction step, drop yet-unmerged elements shorter than `min_size` base pairs, then compact again. Set to 0 to disable this functionality. Minimum value 0. |
 | `no_group_by` | Boolean | False | If true, every unique sequence region (chromosome, contig etc.) is treated as its own genome. Used eg. for the purpose of determining whether an element is duplicated (it could be duplicated within a whole genome, but in two different chromosomes). |
 | `merge_with_dup` | Boolean | False | When `True`, avoids marking duplicated elements in each genome and merges them as if they were unique. <br></br> Setting this option to `True` effectively activates the MICE (dup) mode described in the paper. Keeping it `False` instead keeps MICE (Bp bij) mode active. |
+| `k` | Integer | 31 | Size of `k` to use for the de Bruijn Graph construction when using `ggcat` directly on FASTA files (no effect if starting with GFF graph as input) |

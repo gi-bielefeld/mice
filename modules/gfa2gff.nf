@@ -9,7 +9,6 @@ process gfa2gff {
     output:
     path "mice_input_graph.gff", emit: out_gff_graph
 
-    // TODO threads
     script:
     """
     gfa2gff ${params.k} ${input_graph_gfa} \$(find \$(realpath ${input_fasta_dir}) -type f -name '*.fa' -o -name '*.fa.gz' -o -name '*.fna' -o -name '*.fna.gz' -o -name '*.fasta' -o -name '*.fasta.gz') > mice_input_graph.gff

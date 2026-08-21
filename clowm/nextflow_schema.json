@@ -15,36 +15,37 @@
                     "type": "string",
                     "format": "file-path",
                     "fa_icon": "fas fa-project-diagram",
-                    "description": "Path to MICE input graph file in .gff format"
-                },
-                "input_graph_gfa": {
-                    "type": "string",
-                    "fa_icon": "fas fa-project-diagram",
-                    "description": "Path to gfa2gff input graph file in .gfa format",
-                    "format": "file-path"
+                    "description": "Path to MICE input graph file in .gff format",
+                    "help_text": "Use this if you already have a correctly-formatted GFF graph, and do not need to construct one using ggcat. Incompatible with `input_fasta_dir`."
                 },
                 "input_fasta_dir": {
                     "type": "string",
                     "description": "Path to directory containing FASTA files for use with ggcat (DBG generation) or gfa2gff (GFA to GFF format conversion)",
                     "format": "directory-path",
                     "fa_icon": "far fa-folder-open",
-                    "help_text": "This option is only to be used when running `ggcat` or `gfa2gff` to prepare the input file for MICE. If running MICE directly, omit this option.\nPlease ensure only FASTA files (any file ending is ok, but make sure they are not compressed) are present in this directory."
+                    "help_text": "This option is only to be used when running `ggcat` or `gfa2gff` to prepare the input file for MICE. If running MICE directly, omit this option.\nPlease ensure only FASTA files (permitted file endings: .fa, .fa.gz, .fna, .fna.gz, .fasta, .fasta.gz) are present in this directory."
                 },
                 "out_dir": {
                     "type": "string",
-                    "description": "Name of output directory to which MICE writes its output files",
+                    "description": "Path to directory in which MICE will write its output files",
                     "format": "directory-path",
                     "fa_icon": "fas fa-folder-open"
-                },
-                "intermediate_dir": {
-                    "type": "string",
-                    "fa_icon": "fas fa-folder-open",
-                    "description": "Path to directory in which ggcat/gfa2gff will output their intermediate files",
-                    "format": "directory-path"
                 }
             },
             "required": [
                 "out_dir"
+            ],
+            "oneOf": [
+                {
+                    "required": [
+                        "input_graph_gff"
+                    ]
+                },
+                {
+                    "required": [
+                        "input_fasta_dir"
+                    ]
+                }
             ],
             "fa_icon": "fas fa-copy"
         },
@@ -84,6 +85,13 @@
                     "type": "boolean",
                     "description": "Avoid marking duplicated elements in each genome and merge them as if they were unique.",
                     "fa_icon": "fab fa-buffer"
+                },
+                "k": {
+                    "type": "integer",
+                    "description": "Size of `k` for ggcat/gfa2gff graph building.",
+                    "default": 31,
+                    "minimum": 1,
+                    "fa_icon": "fas fa-arrows-alt-h"
                 }
             },
             "fa_icon": "fas fa-cogs",

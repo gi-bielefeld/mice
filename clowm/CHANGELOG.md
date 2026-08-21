@@ -2,6 +2,11 @@
 
 ## Unreleased (Work in Progress)
 
+## 0.2.1 - 2026-08-22
+
+### Fixed
+- A bit of the parametrisation
+
 ## 0.2.0 - 2026-08-21
 
 ### Added 
