@@ -4,7 +4,8 @@
 
 | Name | Datatype | Default | Description |
 | :-: | :-: | :-: | :- | 
-| `input_fasta` | Filepath | - | A filepath to a single GFF-format file, where each entry has a 1-based `ID=` attribute. <br></br> The file must be plain-text (not "rich text", eg. `.rtf` or `.docx`), but can have any name and any suffix (ie. it doesn't necessarily need to end in `.gff` or similar). <br></br> Do not submit raw text or any other non-filepath input into this parameter - only a string representing a filepath, pointing to a file that already exists in your chosen S3 bucket.|
+| `input_graph_gff` | Filepath | - | A filepath to a single GFF-format file, where each entry has a 1-based `ID=` attribute. <br></br> The file must be plain-text (not "rich text", eg. `.rtf` or `.docx`), but can have any name and any suffix (ie. it doesn't necessarily need to end in `.gff` or similar). <br></br> Do not submit raw text or any other non-filepath input into this parameter - only a string representing a filepath, pointing to a file that already exists in your chosen S3 bucket. <br></br> This option is mutually exclusive with `input_fasta_dir`.|
+| `input_fasta_dir` | Filepath | - | A filepath to a directory in an accessible S3 bucket, containing several FASTA files from which the input to MICE will be constructed. <br></br> This option is mutually exclusive with `input_graph_gff`.|
 | `out_dir` | Filepath | - | A filepath to a directory where you want MICE to save its three output files. This can be just the root of an S3 bucket, or a directory inside it (if it doesn't exist, it will be created). See the "Output" tab for more information on the output format.|
 
 ## Execution Options

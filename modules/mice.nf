@@ -6,9 +6,9 @@ process mice {
     val params
 
     output:
-    path "./output.gff", emit: out_graph
-    path "./partitions.txt", emit: out_parts
-    path "./paths.txt", emit: out_paths
+    path "mice_output/output.gff", emit: out_graph
+    path "mice_output/partitions.txt", emit: out_parts
+    path "mice_output/paths.txt", emit: out_paths
 
     script:
     def remove_dup = "-r ${params.remove_dup}"
@@ -19,6 +19,6 @@ process mice {
     def merge_with_dup = params.no_group_by ? "--merge-with-dup" : ""
 
     """
-    mice ${remove_dup} ${quorum} ${min_size} ${no_group_by} ${merge_with_dup} -o ./ ${input_graph_gff}
+    mice ${remove_dup} ${quorum} ${min_size} ${no_group_by} ${merge_with_dup} ${input_graph_gff}
     """
 }

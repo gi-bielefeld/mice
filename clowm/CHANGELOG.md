@@ -2,6 +2,11 @@
 
 ## Unreleased (Work in Progress)
 
+## 0.2.0 - 2026-08-21
+
+### Added 
+- `ggcat` and `gfa2gff` functionality to start with FASTA files instead of a .gff
+
 ## 0.1.4 - 2026-07-30
 
 ### Added

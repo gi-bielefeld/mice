@@ -1,5 +1,7 @@
 #!/usr/bin/env nextflow
 include { mice } from './modules/mice.nf'
+include { gfa2gff } from './modules/gfa2gff.nf'
+include { ggcat } from './modules/ggcat.nf'
 
 def parseS3Path(String path) {
     def s3_pattern = ~/^s3:\/\/([a-z0-9.-]{3,63})(?:\/(.*))?$/
@@ -22,13 +24,19 @@ workflow {
     main:
     def input_channel = channel.empty()
 
-    def input_filepath = file(params.input_graph_gff)
-
-    if (input_filepath.exists() && !input_filepath.isDirectory()) {
-        input_channel = channel.fromPath(params.input_graph_gff, checkIfExists: true)
-    }
-    else {
-        error("[ERROR] Invalid input: '${params.input_graph_gff}' is not a valid file path for --input_graph_gff.")
+    if (params.input_graph_gff == null) {
+        ggcat(params.input_fasta_dir, params)
+        gfa2gff(ggcat.out.out_gfa_graph, params.input_fasta_dir, params)
+        mice(gfa2gff.out.out_gff_graph,params)
+    } else {
+        def input_filepath = file(params.input_graph_gff)
+        if (input_filepath.exists() && !input_filepath.isDirectory()) {
+            input_channel = channel.fromPath(params.input_graph_gff, checkIfExists: true)
+        }
+        else {
+            error("[ERROR] Invalid input: '${params.input_graph_gff}' is not a valid file path for --input_graph_gff.")
+        }
+        mice(input_channel,params)
     }
 
     // output s3 dir - URI validation
@@ -37,17 +45,15 @@ workflow {
         error("Invalid output: '${params.out_dir}' is not a valid s3 URI for the output directory.")
     }
 
-    mice(input_channel,params)
-
     publish:
     mice_out_graph = mice.out.out_graph
     mice_out_parts = mice.out.out_parts
     mice_out_paths = mice.out.out_paths
 
     onComplete:
-    log.info("Pipeline finished. Cleaning up the artefact '.' folder in output dir ${params.output_dir}")
+    log.info("Pipeline finished. Cleaning up the artefact '.' folder in output dir ${params.out_dir}")
     try {
-        to_delete = file("${params.output_dir}/.")
+        to_delete = file("${params.out_dir}/.")
         to_delete.deleteDir()
         log.info("Successfully removed the '.' S3 artefact.")
     } catch (Exception e) {

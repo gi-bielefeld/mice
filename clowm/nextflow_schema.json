@@ -17,15 +17,33 @@
                     "fa_icon": "fas fa-project-diagram",
                     "description": "Path to MICE input graph file in .gff format"
                 },
+                "input_graph_gfa": {
+                    "type": "string",
+                    "fa_icon": "fas fa-project-diagram",
+                    "description": "Path to gfa2gff input graph file in .gfa format",
+                    "format": "file-path"
+                },
+                "input_fasta_dir": {
+                    "type": "string",
+                    "description": "Path to directory containing FASTA files for use with ggcat (DBG generation) or gfa2gff (GFA to GFF format conversion)",
+                    "format": "directory-path",
+                    "fa_icon": "far fa-folder-open",
+                    "help_text": "This option is only to be used when running `ggcat` or `gfa2gff` to prepare the input file for MICE. If running MICE directly, omit this option.\nPlease ensure only FASTA files (any file ending is ok, but make sure they are not compressed) are present in this directory."
+                },
                 "out_dir": {
                     "type": "string",
                     "description": "Name of output directory to which MICE writes its output files",
                     "format": "directory-path",
                     "fa_icon": "fas fa-folder-open"
+                },
+                "intermediate_dir": {
+                    "type": "string",
+                    "fa_icon": "fas fa-folder-open",
+                    "description": "Path to directory in which ggcat/gfa2gff will output their intermediate files",
+                    "format": "directory-path"
                 }
             },
             "required": [
-                "input_graph_gff",
                 "out_dir"
             ],
             "fa_icon": "fas fa-copy"
@@ -68,7 +86,8 @@
                     "fa_icon": "fab fa-buffer"
                 }
             },
-            "fa_icon": "fas fa-cogs"
+            "fa_icon": "fas fa-cogs",
+            "help_text": ""
         }
     },
     "allOf": [
