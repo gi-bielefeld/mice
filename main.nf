@@ -49,6 +49,9 @@ workflow {
     mice_out_graph = mice.out.out_graph
     mice_out_parts = mice.out.out_parts
     mice_out_paths = mice.out.out_paths
+    // if (params.input_graph_gff == null) {
+    dbg_gff = gfa2gff.out.out_gff_graph
+    // }
 
     onComplete:
     log.info("Pipeline finished. Cleaning up the artefact '.' folder in output dir ${params.out_dir}")
@@ -69,6 +72,9 @@ output {
         mode "copy"
     }
     mice_out_paths {
+        mode "copy"
+    }
+    dbg_gff {
         mode "copy"
     }
 }

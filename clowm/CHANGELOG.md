@@ -1,6 +1,9 @@
 # Changelog - MICE CloWM Workflow
 
-## Unreleased (Work in Progress)
+## 0.2.2 - 2026-09-11
+
+### Added
+- Now outputs the `gff` produced by `gfa2gff`
 
 ## 0.2.1 - 2026-08-22
 
