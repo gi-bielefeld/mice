@@ -1,5 +1,12 @@
 # Changelog - MICE CloWM Workflow
 
+## 1.0.0 - 2026-09-13
+
+CloWM Production 1.0 release
+
+### Changed
+- Tiny bit of output description to say that sequence regions are uniquely identified
+
 ## 0.2.2 - 2026-09-11
 
 ### Added
