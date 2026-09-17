@@ -12,7 +12,7 @@ A section of an example `output.gff` file looks like this:
 
 ```
 ##gff-version 3
-##sequence-region NC_000913.3 1 4641652
+##sequence-region NC_000913.3#1 1 4641652
 ...
 NC_000913.3#1     mice    SO:0000856      1       5593    .       +       .       ID=4051;genome=GCF_000005845.2_ASM584v2_genomic.fna
 NC_000913.3#1     mice    SO:0000856      5564    5594    .       +       .       ID=3289;genome=GCF_000005845.2_ASM584v2_genomic.fna

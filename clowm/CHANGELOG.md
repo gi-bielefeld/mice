@@ -1,5 +1,10 @@
 # Changelog - MICE CloWM Workflow
 
+## 1.0.1 - 2026-xx-xx
+
+### Changed
+- Small edits to the workflow documentation
+
 ## 1.0.0 - 2026-09-13
 
 CloWM Production 1.0 release
