@@ -1,22 +1,27 @@
-# mice 
+# `mice` 
 
-`mice` computes **synteny blocks** from genomes expressed as sequences of genomic elements.
-These elements can come from a genome graph (e.g., unitigs of a compacted de Bruijn graph), or from any other segmentation such as k-mers, genes, or MUMs/MEMs.
+`mice` is the software implementation of the MICE algorithm for deriving **synteny blocks** from sequence data (see Citation section below). `mice` computes synteny blocks from genomes expressed as sequences of genomic elements.
+
+These elements can come from a genome graph (e.g., unitigs of a Compacted de Bruijn Graph), or from any other segmentation such as k-mers, genes, or MUMs/MEMs.
 
 The input of `mice` is a GFF file in which each feature has an `ID` attribute (1-based index) specifying the element used in the path spelling the genome or chromosome.
 
+## NEW: Try `mice` on CloWM!
+
+`mice` is available on the [workflow platform CloWM](https://clowm.bi.denbi.de/workflows/01a09b81-950f-779c-a435-23f0c423449a/). Try it there for free, no sign-up or local installation necessary.
+
 ## Installation
 
-`mice` is written in rust, therefore you only need cargo to install it:
+`mice` is written in Rust, therefore you only need cargo to install it:
 
 ```bash
 cargo install --path .
 ```
 
-Alternatively, `mice` is available on bioconda (use conda or mamba):
+Alternatively, `mice` is available on bioconda:
 
 ```bash
-mamba install -c bioconda mice 
+mamba install -c conda-forge -c bioconda mice 
 ```
 
 ## Quick start
@@ -24,24 +29,25 @@ mamba install -c bioconda mice
 We provide five *E. coli* genomes as an example dataset.
 
 1. Use the provided graph  
+
    A precomputed `example/graph.gff.gz` is included.  
-   Uncompress it (for example: `gunzip -c example/graph.gff.gz > graph.gff`) and go directly to running `mice`.  
+   Uncompress it (for example: `gunzip -c example/graph.gff.gz > graph.gff`) and go directly to Step 3 "Run `mice`".  
 
 2. (*Optional*) Build the pangenome graph yourself
 
-   Install `ggcat`:
+   Install [`ggcat`](https://github.com/algbio/ggcat), eg. through `bioconda`:
 
    ```bash
-   conda install -c conda-forge -c bioconda ggcat
+   mamba install -c conda-forge -c bioconda ggcat
    ```
 
-   Build a compacted de Bruijn graph:
+   Build the Compacted de Bruijn Graph:
 
    ```bash
    ggcat build -k 31 -s 1 -l example/list.txt -o graph.gfa --gfa-v1
    ```
 
-   Convert the graph to GFF:
+   Install [`gfa2gff`](https://github.com/lucaparmigiani/gfa2gff) and convert the graph to GFF:
 
    ```bash
    git clone https://github.com/lucaparmigiani/gfa2gff.git
@@ -51,40 +57,103 @@ We provide five *E. coli* genomes as an example dataset.
    ./gfa2gff/gfa2gff 31 graph.gfa $(ls -1 example/*.fna.gz) > graph.gff
    ```
 
-3. Run mice
+3. Run `mice`
 
    ```bash
    mice graph.gff
    ```
 
-## Usage
+## Usage & Options
 
 ```bash
 mice [OPTIONS] <GRAPH_INPUT>
 ```
 
-* `<GRAPH_INPUT>` – input graph file (GFF or GFA with path representing genomes)
+where `<GRAPH_INPUT>` is a path to a GFF or GFA input graph file with paths representing genomes.
 
-### Options
+### Option Descriptions
 
-* `-o, --out-dir <DIR>`
-  Output directory (default: `mice_output`)
-
-* `-r, --remove-dup <X>`
-  Remove an element if it occurs at least *X* times in any genome (`0` = disable, default: `0`)
-
-* `-m, --min-size <bp>`
-  After first compression, drop unmerged elements shorter than `<bp>` base pairs, then recompress (default: `0`)
-
-* `-s, --no-group-by`
-  Treat every path as its own genome
-
-* `-h, --help`, `-V, --version`
+| Name | Datatype | Default | Description |
+| :-: | :-: | :-: | :- |
+| `-o`, `--out-dir` | Path | - | A path to a directory where you want MICE to save its three output files. |
+| `-r`, `--remove-dup` | Integer | 0 | Remove an element if it occurs at least `remove-dup` times in any single genome. Set to 0 to disable this functionality. Minimum value 0. A value of 1 will result in an empty input; if you want this option enabled, use 2 or above. |
+| `-q`, `--quorum` | Integer | 0 | Remove an element if it occurs in fewer that `quorum` of the input genomes. Set to 0 to disable this functionality. Minimum value 0. If you set this option to a value higher than the amount of input genomes, it will result in an empty input. |
+| `-m`, `--min-size` | Integer | 0 | After the first compaction step, remove yet-unmerged elements shorter than `min-size` base pairs, then compact again. Set to 0 to disable this functionality. Minimum value 0. |
+| `-s`, `--no-group-by` | Boolean | False | If true, every unique sequence region (chromosome, contig etc.) is treated as its own genome. Used eg. for the purpose of determining whether an element is duplicated (it could be duplicated within a whole genome, but in two different chromosomes). |
+| `--merge-with-dup` | Boolean | False | When `True`, avoids marking duplicated elements in each genome and merges them as if they were unique. <br></br> Setting this option to `True` effectively activates the MICE (dup) mode described in the paper. Keeping it `False` instead keeps MICE (Bp bij) mode active. |
 
 ## Output
 
-In `<OUT_DIR>` MICE writes:
+In the specified output directory, `mice` writes three files: `output.gff`, `paths.txt` and `partitions.txt`.
 
-* `output.gff`: block annotations (GFF)
-* `paths.txt`: genomes rewritten as synteny blocks
-* `partitions.txt`: each synteny block which element it contains
+### `output.gff`
+
+This GFF file contains the annotations of the resulting synteny blocks. It follows the standard GFF3 format.
+
+A section of an example `output.gff` file looks like this:
+
+```
+##gff-version 3
+##sequence-region NC_000913.3 1 4641652
+...
+NC_000913.3     mice    SO:0000856      1       5593    .       +       .       ID=4051;genome=GCF_000005845.2_ASM584v2_genomic.fna
+NC_000913.3     mice    SO:0000856      5564    5594    .       +       .       ID=3289;genome=GCF_000005845.2_ASM584v2_genomic.fna
+NC_000913.3     mice    SO:0000856      5565    5597    .       +       .       ID=3223;genome=GCF_000005845.2_ASM584v2_genomic.fna
+NC_000913.3     mice    SO:0000856      5568    5599    .       +       .       ID=3167;genome=GCF_000005845.2_ASM584v2_genomic.fna
+NC_000913.3     mice    SO:0000856      5570    5600    .       +       .       ID=3263;genome=GCF_000005845.2_ASM584v2_genomic.fna
+NC_000913.3     mice    SO:0000856      5571    5601    .       -       .       ID=3213;genome=GCF_000005845.2_ASM584v2_genomic.fna
+NC_000913.3     mice    SO:0000856      5572    5602    .       -       .       ID=3296;genome=GCF_000005845.2_ASM584v2_genomic.fna
+NC_000913.3     mice    SO:0000856      5573    5658    .       -       .       ID=253315;genome=GCF_000005845.2_ASM584v2_genomic.fna
+NC_000913.3     mice    SO:0000856      5629    5671    .       -       .       ID=277551;genome=GCF_000005845.2_ASM584v2_genomic.fna
+NC_000913.3     mice    SO:0000856      5642    9967    .       -       .       ID=1727;genome=GCF_000005845.2_ASM584v2_genomic.fna
+...
+```
+
+The first section of the file, commented with `##`, contains the metadata header. Following this, each entry has the following columns:
+
+1. Uniquely-identified sequence region (chromosome, contig etc.) in which the synteny block is located
+2. `mice` feature source identifier
+3. "Conserved" ontology tag (feature type) 
+4. Start position of block
+5. End position of block
+6. _Score (ignored)_
+7. Strand
+8. _Frame (ignored)_
+9. Attributes `ID`, which gives the unique numerical ID of the synteny block (corresponding to its canonical anchor); and `genome`, the block's genome of origin.
+
+
+### `paths.txt`
+
+This text file contains the input genomes re-spelled with block instances, rather than nucleotides.
+
+A section of an example `paths.txt` file looks like this:
+
+```
+>GCF_000005845.2_ASM584v2_genomic.fna#NC_000913.3
+4051+,3289+,3223+,3167+,3263+,3213-,3296-,253315-,277551-,1727-,7202+,136610-,...
+```
+
+The file will be `2n` lines long, where `n` is the amount of individual input genomes. Odd-numbered lines will have a FASTA-style header with the name of the genome about to be re-spelled; the line underneath each header will be the entire genome, respelled as a comma-separated sequence of block instances in the format `<ID><SIGN>`, where `<ID>` is the block's unique `ID` attribute (as given in `output.gff`) and `<SIGN>` is either `+` or `-`, denoting whether this instance of the block is in its "forward" or "backward" orientation, respectively.
+
+### `partitions.txt`
+
+This text file contains the elements which where merged into each block's canonical anchor.
+
+A section of an example `partitions.txt` file looks like this:
+
+```
+1: 1
+2: 2
+3: 3
+4: 4 422 1565 2417 2453 2629 2632 3889 ...
+```
+
+The file will have as many lines as there are synteny blocks. Each line will start with `<ID>: `, the ID of the canonical anchor which represents that synteny block, followed by a space-separated list of element IDs which were merged into this synteny block. The first element in this list always matches the canonical anchor ID (as, by definition, every block contains its canonical anchor); if this is the only element present in the list, the synteny block is a singleton.
+
+## Citation
+
+Leonard Bohnenkämper, Luca Parmigiani, Kamil Hepak, Cedric Chauve, Jens Stoye
+
+**On Deriving Synteny Blocks by Compacting Elements**
+
+*2026 Preprint: https://www.biorxiv.org/content/10.64898/2025.12.15.694404v2*
