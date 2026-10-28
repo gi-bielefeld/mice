@@ -6,9 +6,9 @@ These elements can come from a genome graph (e.g., unitigs of a Compacted de Bru
 
 The input of `mice` is a GFF file in which each feature has an `ID` attribute (1-based index) specifying the element used in the path spelling the genome or chromosome.
 
-## NEW: Try `mice` on CloWM!
+## Run `mice` on CloWM!
 
-`mice` is available on the [workflow platform CloWM](https://clowm.bi.denbi.de/workflows/01a09b81-950f-779c-a435-23f0c423449a/). Try it there for free, no sign-up or local installation necessary.
+`mice` is available on the [workflow platform CloWM](https://clowm.bi.denbi.de/workflows/01a09b81-950f-779c-a435-23f0c423449a/). Run it there for free, no sign-up or local installation necessary.
 
 ## Installation
 
@@ -156,4 +156,4 @@ Leonard Bohnenkämper, Luca Parmigiani, Kamil Hepak, Cedric Chauve, Jens Stoye
 
 **On Deriving Synteny Blocks by Compacting Elements**
 
-*2026 Preprint: https://www.biorxiv.org/content/10.64898/2025.12.15.694404v2*
+https://journals.sagepub.com/doi/full/10.1177/15578666261491605
