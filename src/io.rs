@@ -96,8 +96,9 @@ pub fn write_output(
     out_dir: &path::Path,
     genomes: &HashMap<String, PathBundle>,
     node_to_part: &[usize],
+    write_phrases: bool,
 ) -> Result<()> {
-    find_graph_type(input, force_ext)?.write_graph(out_dir, genomes, node_to_part)
+    find_graph_type(input, force_ext)?.write_graph(out_dir, genomes, node_to_part, write_phrases)
 }
 
 pub fn write_paths(
@@ -236,6 +237,7 @@ pub trait GraphReader {
         out_dir: &path::Path,
         genomes: &HashMap<String, PathBundle>,
         node_to_part: &[usize],
+        write_phrases: bool,
     ) -> Result<()>;
 
     fn genomes_to_graph(

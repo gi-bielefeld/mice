@@ -81,6 +81,7 @@ where `<GRAPH_INPUT>` is a path to a GFF or GFA input graph file with paths repr
 | `-m`, `--min-size` | Integer | 0 | After the first compaction step, remove yet-unmerged elements shorter than `min-size` base pairs, then compact again. Set to 0 to disable this functionality. Minimum value 0. |
 | `-s`, `--no-group-by` | Boolean | False | If true, every unique sequence region (chromosome, contig etc.) is treated as its own genome. Used eg. for the purpose of determining whether an element is duplicated (it could be duplicated within a whole genome, but in two different chromosomes). |
 | `--merge-with-dup` | Boolean | False | When `True`, avoids marking duplicated elements in each genome and merges them as if they were unique. <br></br> Setting this option to `True` effectively activates the MICE (dup) mode described in the paper. Keeping it `False` instead keeps MICE (Bp bij) mode active. |
+| `--phrase-paths` | Boolean | False | When `True`, writes each block occurence's (phrase's) elements as a `path` attribute in the corresponding GFF record, oriented so the block's canonical anchor reads '+' (filtered elements are omitted). |
 
 ## Output
 
@@ -120,6 +121,8 @@ The first section of the file, commented with `##`, contains the metadata header
 7. Strand
 8. _Frame (ignored)_
 9. Attributes `ID`, which gives the unique numerical ID of the synteny block (corresponding to its canonical anchor); and `genome`, the block's genome of origin.
+
+With `--write-phrases`, the Attributes column also gains a `path` attribute which lists the exact (non-filtered) elements which spell a block's instance (phrase), oriented so that the canonical anchor of the block is positive.
 
 
 ### `paths.txt`

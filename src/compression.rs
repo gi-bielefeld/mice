@@ -46,7 +46,7 @@ pub fn run_mice(
     write_paths(out_dir, &genomes, &partition_bundle.node_to_part)?;
     write_partition(out_dir, num_elements, &partition_bundle.node_to_part, node_indexer)?;
 
-    write_output(graph_input, force_ext, out_dir, &genomes, &partition_bundle.node_to_part)?;
+    write_output(graph_input, force_ext, out_dir, &genomes, &partition_bundle.node_to_part, args.write_phrases)?;
 
     Ok(())
 }
@@ -153,43 +153,6 @@ pub fn compress_graph_linear(
 }
 
 #[allow(dead_code)]
-pub fn run_mice_hardcoded(input: &str, out_dir: &str, force_ext: Option<&str>) -> Result<usize> {
-    let remove_duplicates = 0usize;
-    let quorum = 0usize;
-    let group_by = true;
-    let merge_with_dup = false;
-    let (graph_bundle, genome_bundle, partition_bundle) = load_graph(input, force_ext, remove_duplicates, quorum, group_by, merge_with_dup)?;
-    let GraphBundle { mut graph, num_elements, duplicates, counts, } = graph_bundle;
-    let GenomeBundle { genomes, num_paths, node_indexer, } = genome_bundle;
-
-    let partition_bundle = compress_graph_linear(&mut graph, num_elements, partition_bundle, &duplicates, &counts);
-
-    eprintln!("num genomes:\t{}", genomes.len());
-    eprintln!("num paths:\t{}", num_paths);
-    eprintln!("num nodes: {}", num_elements);
-    eprintln!("num partitions: {}", partition_bundle.num_parts);
-    eprintln!(
-        "ratio: {:.2}",
-        partition_bundle.num_parts as f64 / num_elements as f64
-    );
-
-    let out_dir = path::Path::new(out_dir);
-    if !out_dir.exists() {
-        fs::create_dir_all(out_dir)?;
-    }
-
-    write_paths(out_dir, &genomes, &partition_bundle.node_to_part)?;
-    eprintln!("paths written");
-    write_partition(out_dir, num_elements, &partition_bundle.node_to_part, node_indexer)?;
-    eprintln!("partitions written");
-    write_output(input, force_ext, out_dir, &genomes, &partition_bundle.node_to_part)?;
-    eprintln!("output written");
-    Ok(partition_bundle.num_parts)
-
-}
-
-
-#[allow(dead_code)]
 pub fn run_mice_test(input: &str, force_ext: Option<&str>) -> Result<usize> {
     let remove_duplicates = 0usize;
     let quorum = 0usize;
@@ -212,4 +175,3 @@ pub fn run_mice_test(input: &str, force_ext: Option<&str>) -> Result<usize> {
 
     Ok(partition_bundle.num_parts)
 }
-

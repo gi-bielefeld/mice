@@ -21,6 +21,7 @@ impl GraphReader for Gfa {
         out_dir: &path::Path,
         genomes: &HashMap<String, PathBundle>,
         node_to_part: &[usize],
+        write_phrases: bool,
     ) -> Result<()> {
         Ok(())
     }

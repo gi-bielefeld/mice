@@ -24,6 +24,7 @@ impl GraphReader for Gff {
         out_dir: &path::Path,
         genomes: &HashMap<String, PathBundle>,
         node_to_part: &[usize],
+        write_phrases: bool,
     ) -> Result<()> {
         let output = out_dir.join("output.gff");
         std::fs::remove_file(&output).ok();
@@ -44,6 +45,16 @@ impl GraphReader for Gff {
                 let path_name = &genome.path_names[z];
                 let path_starts = &genome.path_starts[z];
                 let path_ends = &genome.path_ends[z];
+                // ";path=..." attribute for path[a..=b]: non-filtered elements, oriented so the canonical anchor reads '+'
+                let path_attr = |a: usize, b: usize, plus: bool| -> String {
+                    if !write_phrases {
+                        return String::new();
+                    }
+                    let fmt = |x: &SignedId| format!("{}{}", x.id + 1, if x.plus == plus { '+' } else { '-' });
+                    let els = path[a..=b].iter().filter(|x| node_to_part[x.id] != FILTERED);
+                    let els: Vec<String> = if plus { els.map(fmt).collect() } else { els.rev().map(fmt).collect() };
+                    format!(";path={}", els.join(","))
+                };
                 let mut i = 0usize;
                 while i < path.len() {
                     while i < path.len() && node_to_part[path[i].id] == FILTERED {
@@ -96,7 +107,8 @@ impl GraphReader for Gff {
                             let strand = if last_el_core.plus { '+' } else { '-' };
                             let first_start = path_starts[i];
                             let last_end = path_ends[j];
-                            writeln!(writer, "{path_name}\tmice\tSO:0000856\t{first_start}\t{last_end}\t.\t{strand}\t.\tID={};genome={genome_name}", part+1)?;
+                            let attr = path_attr(i, j, last_el_core.plus);
+                            writeln!(writer, "{path_name}\tmice\tSO:0000856\t{first_start}\t{last_end}\t.\t{strand}\t.\tID={};genome={genome_name}{attr}", part+1)?;
 
                             // Obscured filtered ranges
                             let mut l = i + 1;
@@ -139,6 +151,7 @@ impl GraphReader for Gff {
                         n if n > 1 => {
                             let mut l = i;
                             while l <= j {
+                                let first = l;
                                 let start = path_starts[l];
                                 while l <= j && node_to_part[path[l].id] != path[l].id {
                                     l += 1;
@@ -150,7 +163,8 @@ impl GraphReader for Gff {
                                         l += 1;
                                     }
                                     let end = path_ends[l];
-                                    writeln!(writer, "{path_name}\tmice\tSO:0000856\t{start}\t{end}\t.\t{strand}\t.\tID={};genome={genome_name}", part+1)?;
+                                    let attr = path_attr(first, l, strand == '+');
+                                    writeln!(writer, "{path_name}\tmice\tSO:0000856\t{start}\t{end}\t.\t{strand}\t.\tID={};genome={genome_name}{attr}", part+1)?;
                                     l += 1;
                                 }
                             }
@@ -168,7 +182,6 @@ impl GraphReader for Gff {
                                 eprint!("{}{} ", x.id+1, if x.plus {'+'} else {'-'});
                             }
                             eprintln!();
-                            return Ok(());
                         }
                     }
                     i = end + 1;
